@@ -109,7 +109,7 @@ def query_elections(q):
 
 
 def format_res(section, place, res):
-    s = f"Resultados <i>{section}</i> en <b>{place['name']}</b> al <i>{res[0]['pcenes']}</i>\n\n"
+    s = f"Resultados <i>{section}</i> en <b>{place['name']}</b> (<i>{place['level']}</i>) al <b>{res[0]['pcenes']}</b> escrutado\n\n"
 
     s += f"<b>Participación</b>: {res[0]['pvotant']} [<i>{res[0]['dpvotant']}</i>]\n\n"
 
