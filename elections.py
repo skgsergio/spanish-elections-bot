@@ -22,6 +22,7 @@ import requests
 SITE_BASE = "https://www.resultados.eleccionesgenerales19.es"
 NOMENCLATOR = SITE_BASE + "/assets/nomenclator.json"
 RESULTS = SITE_BASE + "/json/{t}/{t}{cod}.json"
+AV = SITE_BASE + "/json/AV/CO{cod}.json"
 
 CODES = {
     "congreso": "CO",
@@ -52,6 +53,9 @@ def loadNomenclator():
 def getPlaces(name, election, limit=4):
     if not name:
         name = "Total nacional"
+
+    if election == "avances":
+        election = "congreso"
 
     pos = difflib.get_close_matches(name, names["places"][CODES[election]].values(), n=limit)
 
@@ -97,6 +101,24 @@ def getResults(code, election, limit=5):
     act.sort(key=sortResults)
 
     return (res["totales"]["act"], act[:limit])
+
+
+def getAV(code):
+    r = requests.get(AV.format(cod=code))
+    r.encoding = "utf-8"
+
+    if r.status_code != 200:
+        raise Exception(f"Failed getting 'AV' results for '{code}'. HTTP Status: {r.status_code}")
+
+    res = r.json()
+
+    act = []
+
+    for av in res["avans"]:
+        if av["mesas"]["meava"] != "0":
+            act.append(av["act"])
+
+    return act
 
 
 loadNomenclator()

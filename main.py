@@ -51,33 +51,48 @@ def i_dont_like_groups(m):
 def query_elections(q):
     try:
         qs = q.query.split(" ")
+        section = qs[0]
+        query = " ".join(qs[1:])
 
-        if qs[0] not in elections.CODES.keys():
+        if section not in elections.CODES.keys() and section != "avances":
             bot.answer_inline_query(q.id, [
                 types.InlineQueryResultArticle(
                     "None",
                     f"Indica la elección: {', '.join(elections.CODES.keys())}",
-                    types.InputTextMessageContent(f"No se ha especificado la elección.\n\nDisponibles: {', '.join(elections.CODES.keys())}")
+                    types.InputTextMessageContent(f"Especifica los datos que quieres consultar: {', '.join(elections.CODES.keys())}, avances")
                 )
             ])
 
-        else:
-            election = qs[0]
-            query = " ".join(qs[1:])
-
-            places = elections.getPlaces(query, election)
-
-            logger.info(f"[{q.from_user.id}][{q.from_user.first_name} {q.from_user.last_name} @{q.from_user.username}]: {election} {query} - Results: {', '.join(places.values())}")
+        elif section == "avances":
+            places = elections.getPlaces(query, section)
 
             r = []
             for cod, place in places.items():
-                res = elections.getResults(cod, election)
+                res = elections.getAV(cod)
 
                 title = f"{place} ({cod})"
                 r.append(types.InlineQueryResultArticle(
-                    hashlib.sha256(title.encode('utf-8')).hexdigest(),
+                    hashlib.sha256(section.encode("utf-8") + title.encode("utf-8")).hexdigest(),
                     title,
-                    format_res_message(election, place, res)
+                    format_av(place, res)
+                ))
+
+            bot.answer_inline_query(q.id, r)
+
+        else:
+            places = elections.getPlaces(query, section)
+
+            logger.info(f"[{q.from_user.id}][{q.from_user.first_name} {q.from_user.last_name} @{q.from_user.username}]: {section} {query} - Results: {', '.join(places.values())}")
+
+            r = []
+            for cod, place in places.items():
+                res = elections.getResults(cod, section)
+
+                title = f"{place} ({cod})"
+                r.append(types.InlineQueryResultArticle(
+                    hashlib.sha256(section.encode("utf-8") + title.encode("utf-8")).hexdigest(),
+                    title,
+                    format_res(section, place, res)
                 ))
 
             bot.answer_inline_query(q.id, r)
@@ -86,8 +101,8 @@ def query_elections(q):
         logger.error(e)
 
 
-def format_res_message(election, place, res):
-    s = f"Resultados <i>{election}</i> en <b>{place}</b> al <i>{res[0]['pcenes']}</i>\n\n"
+def format_res(section, place, res):
+    s = f"Resultados <i>{section}</i> en <b>{place}</b> al <i>{res[0]['pcenes']}</i>\n\n"
 
     s += f"<b>Participación</b>: {res[0]['pvotant']} [<i>{res[0]['dpvotant']}</i>]\n\n"
 
@@ -114,6 +129,15 @@ def format_res_message(election, place, res):
 
             if "dvot" in r:
                 s += f" [<i>{r['dvot']}</i> (<i>{r['dpvot']}</i>)]"
+
+    return types.InputTextMessageContent(s, parse_mode="HTML")
+
+
+def format_av(place, res):
+    s = f"Avances de participación en <b>{place}</b>\n"
+
+    for r in res:
+        s += f"\n• {r['vava']} ({r['pvava']}) [<i>{r['dvava']}</i> (<i>{r['dpvava']}</i>)]"
 
     return types.InputTextMessageContent(s, parse_mode="HTML")
 
