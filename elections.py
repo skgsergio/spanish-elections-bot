@@ -85,7 +85,7 @@ def sortResults(r):
     return int(r["carg"]) if "carg" in r else int(r["vot"])
 
 
-def getResults(code, section, limit=5):
+def getResults(code, section, limit=8):
     r = requests.get(RESULTS.format(t=CODES[section], cod=code))
     r.encoding = "utf-8"
 
@@ -107,7 +107,6 @@ def getResults(code, section, limit=5):
                 act.append(rs)
 
     elif "cantotabla" in res:
-        limit *= 2
         for ra in res["cantotabla"]:
             if ra["codpar"] != "0000":
                 rs = {
