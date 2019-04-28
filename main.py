@@ -33,12 +33,22 @@ username = bot.get_me().username
 
 
 @bot.message_handler(commands=["start", "help"])
-def send_welcome(message):
-    bot.reply_to(message, f"Soy un bot inline, escribe en cualquier chat @{username} y te saldrá un menú.\n\nNo necesito estar en grupo para funcionar.")
+def i_am_inline(m):
+    bot.reply_to(m, f"Soy un bot inline, escribe en cualquier chat @{username} y te saldrá un menú.\n\nNo necesito estar en grupo para funcionar.")
+
+
+@bot.message_handler(content_types=["new_chat_members"])
+def i_dont_like_groups(m):
+    try:
+        logger.info(f"Leaving: {m.chat.title} ({m.chat.id})")
+        bot.leave_chat(m.chat.id)
+
+    except Exception as e:
+        logger.error(e)
 
 
 @bot.inline_handler(lambda q: True)
-def query_text(q):
+def query_elections(q):
     try:
         qs = q.query.split(" ")
 
@@ -53,7 +63,11 @@ def query_text(q):
 
         else:
             election = qs[0]
-            places = elections.getPlaces(" ".join(qs[1:]), election)
+            query = " ".join(qs[1:])
+
+            places = elections.getPlaces(query, election)
+
+            logger.info(f"Query: {election} {query} - Results: {', '.join(places.values())}")
 
             r = []
             for cod, place in places.items():
@@ -63,7 +77,7 @@ def query_text(q):
                 r.append(types.InlineQueryResultArticle(
                     hashlib.sha256(title.encode('utf-8')).hexdigest(),
                     title,
-                    resMessage(election, place, res)
+                    format_res_message(election, place, res)
                 ))
 
             bot.answer_inline_query(q.id, r)
@@ -72,7 +86,7 @@ def query_text(q):
         logger.error(e)
 
 
-def resMessage(election, place, res):
+def format_res_message(election, place, res):
     s = f"Resultados <i>{election}</i> en <b>{place}</b> al <i>{res[0]['pcenes']}</i>\n\n"
 
     s += f"<b>Participación</b>: {res[0]['pvotant']} [<i>{res[0]['dpvotant']}</i>]\n\n"
