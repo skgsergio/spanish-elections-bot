@@ -23,10 +23,17 @@ SITE_BASE = "https://www.resultados.eleccionesgenerales19.es"
 NOMENCLATOR = SITE_BASE + "/assets/nomenclator.json"
 RESULTS = SITE_BASE + "/json/{t}/{t}{cod}.json"
 AV = SITE_BASE + "/json/AV/CO{cod}.json"
+LINK = SITE_BASE + "/{section}/{i}/es"
 
 CODES = {
     "congreso": "CO",
     "senado": "SE"
+}
+
+SECTIONS = {
+    "avances": "Avances",
+    "congreso": "Congreso",
+    "senado": "Senado"
 }
 
 
@@ -53,33 +60,37 @@ def loadNomenclator():
 
     for code in CODES.values():
         names["places"]["names"][code] = {p["n"] for p in res["ambitos"][code.lower()]}
-        names["places"]["data"][code] = {p["c"]: (p["n"], res["constantes"]["level"][str(p["l"])]) for p in res["ambitos"][code.lower()]}
+        names["places"]["data"][code] = {p["c"]: {"name": p["n"], "level": res["constantes"]["level"][str(p["l"])], "i": p["i"]} for p in res["ambitos"][code.lower()]}
         names["parties"][code] = {p["codpar"]: (p["siglas"], p["nombre"]) for p in res["partidos"][code.lower()]["act"]}
 
 
-def getPlaces(name, election, limit=4):
-    if election == "avances":
-        election = "congreso"
+def getLink(section, i):
+    return LINK.format(section=SECTIONS[section], i=i)
+
+
+def getPlaces(name, section, limit=4):
+    if section == "avances":
+        section = "congreso"
 
     if not name:
         pos = ["Total nacional"]
 
     else:
-        pos = difflib.get_close_matches(name, names["places"]["names"][CODES[election]], n=limit)
+        pos = difflib.get_close_matches(name, names["places"]["names"][CODES[section]], n=limit)
 
-    return {c: n for c, n in names["places"]["data"][CODES[election]].items() if n[0] in pos}
+    return {c: d for c, d in names["places"]["data"][CODES[section]].items() if d["name"] in pos}
 
 
 def sortResults(r):
     return int(r["carg"]) if "carg" in r else int(r["vot"])
 
 
-def getResults(code, election, limit=5):
-    r = requests.get(RESULTS.format(t=CODES[election], cod=code))
+def getResults(code, section, limit=5):
+    r = requests.get(RESULTS.format(t=CODES[section], cod=code))
     r.encoding = "utf-8"
 
     if r.status_code != 200:
-        raise Exception(f"Failed getting '{election}' results for '{code}'. HTTP Status: {r.status_code}")
+        raise Exception(f"Failed getting '{section}' results for '{code}'. HTTP Status: {r.status_code}")
 
     res = r.json()
 
@@ -89,7 +100,7 @@ def getResults(code, election, limit=5):
         for ra in res["partotabla"]:
             if ra["act"]["codpar"] != "0000":
                 rs = {
-                    "party": names["parties"][CODES[election]][ra["act"]["codpar"]][0],
+                    "party": names["parties"][CODES[section]][ra["act"]["codpar"]][0],
                     **ra["act"]
                 }
 
@@ -100,7 +111,7 @@ def getResults(code, election, limit=5):
         for ra in res["cantotabla"]:
             if ra["codpar"] != "0000":
                 rs = {
-                    "party": names["parties"][CODES[election]][ra["codpar"]][0],
+                    "party": names["parties"][CODES[section]][ra["codpar"]][0],
                     **ra
                 }
 

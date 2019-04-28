@@ -66,18 +66,18 @@ def query_elections(q):
         elif section == "avances":
             places = elections.getPlaces(query, section)
 
-            logger.info(f"[{q.from_user.id}][{q.from_user.first_name} {q.from_user.last_name} @{q.from_user.username}]: {section} {query} - Results: {[p[0] for p in places.values()]}")
+            logger.info(f"[{q.from_user.id}][{q.from_user.first_name} {q.from_user.last_name} @{q.from_user.username}]: {section} {query} - Results: {[p['name'] for p in places.values()]}")
 
             r = []
             for cod, place in places.items():
                 res = elections.getAV(cod)
 
-                title = f"{place[0]} ({cod})"
+                title = f"{place['name']} ({cod})"
                 r.append(types.InlineQueryResultArticle(
                     hashlib.sha256(section.encode("utf-8") + title.encode("utf-8")).hexdigest(),
                     title,
-                    format_av(place[0], res),
-                    description=f"{place[1]}"
+                    format_av(place, res),
+                    description=f"{place['level']}"
                 ))
 
             bot.answer_inline_query(q.id, r)
@@ -85,18 +85,18 @@ def query_elections(q):
         else:
             places = elections.getPlaces(query, section)
 
-            logger.info(f"[{q.from_user.id}][{q.from_user.first_name} {q.from_user.last_name} @{q.from_user.username}]: {section} {query} - Results: {[p[0] for p in places.values()]}")
+            logger.info(f"[{q.from_user.id}][{q.from_user.first_name} {q.from_user.last_name} @{q.from_user.username}]: {section} {query} - Results: {[p['name'] for p in places.values()]}")
 
             r = []
             for cod, place in places.items():
                 res = elections.getResults(cod, section)
 
-                title = f"{place[0]} ({cod})"
+                title = f"{place['name']} ({cod})"
                 r.append(types.InlineQueryResultArticle(
                     hashlib.sha256(section.encode("utf-8") + title.encode("utf-8")).hexdigest(),
                     title,
-                    format_res(section, place[0], res),
-                    description=f"{place[1]}"
+                    format_res(section, place, res),
+                    description=f"{place['level']}"
                 ))
 
             bot.answer_inline_query(q.id, r)
@@ -106,7 +106,7 @@ def query_elections(q):
 
 
 def format_res(section, place, res):
-    s = f"Resultados <i>{section}</i> en <b>{place}</b> al <i>{res[0]['pcenes']}</i>\n\n"
+    s = f"Resultados <i>{section}</i> en <b>{place['name']}</b> al <i>{res[0]['pcenes']}</i>\n\n"
 
     s += f"<b>Participación</b>: {res[0]['pvotant']} [<i>{res[0]['dpvotant']}</i>]\n\n"
 
@@ -134,11 +134,13 @@ def format_res(section, place, res):
             if "dvot" in r:
                 s += f" [<i>{r['dvot']}</i> (<i>{r['dpvot']}</i>)]"
 
+    s += f"\n\n<a href=\"{elections.getLink(section, place['i'])}\">Ver datos</a>"
+
     return types.InputTextMessageContent(s, parse_mode="HTML")
 
 
 def format_av(place, res):
-    s = f"Avances de participación en <b>{place}</b>\n"
+    s = f"Avances de participación en <b>{place['name']}</b>\n"
 
     for r in res:
         s += f"\n• {r['vava']} ({r['pvava']}) [<i>{r['dvava']}</i> (<i>{r['dpvava']}</i>)]"
