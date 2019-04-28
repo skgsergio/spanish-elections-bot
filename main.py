@@ -23,6 +23,9 @@ import telebot
 from telebot import types
 
 
+CACHE_TIME = 30
+
+
 logger = telebot.logger
 logger.setLevel(logging.INFO)
 
@@ -77,11 +80,10 @@ def query_elections(q):
                     hashlib.sha256(section.encode("utf-8") + title.encode("utf-8")).hexdigest(),
                     title,
                     format_av(place, res),
-                    description=f"{place['level']}",
-                    cache_time=0
+                    description=f"{place['level']}"
                 ))
 
-            bot.answer_inline_query(q.id, r)
+            bot.answer_inline_query(q.id, r, cache_time=CACHE_TIME)
 
         else:
             places = elections.getPlaces(query, section)
@@ -97,11 +99,10 @@ def query_elections(q):
                     hashlib.sha256(section.encode("utf-8") + title.encode("utf-8")).hexdigest(),
                     title,
                     format_res(section, place, res),
-                    description=f"{place['level']}",
-                    cache_time=0
+                    description=f"{place['level']}"
                 ))
 
-            bot.answer_inline_query(q.id, r)
+            bot.answer_inline_query(q.id, r, cache_time=CACHE_TIME)
 
     except Exception as e:
         logger.error(e)
