@@ -117,7 +117,7 @@ def getResults(code, section, limit=5):
 
                 act.append(rs)
 
-    act.sort(key=sortResults)
+    act.sort(key=sortResults, reverse=True)
 
     return (res["totales"]["act"], act[:limit])
 
