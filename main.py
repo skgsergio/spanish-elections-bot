@@ -77,7 +77,8 @@ def query_elections(q):
                     hashlib.sha256(section.encode("utf-8") + title.encode("utf-8")).hexdigest(),
                     title,
                     format_av(place, res),
-                    description=f"{place['level']}"
+                    description=f"{place['level']}",
+                    cache_time=0
                 ))
 
             bot.answer_inline_query(q.id, r)
@@ -96,7 +97,8 @@ def query_elections(q):
                     hashlib.sha256(section.encode("utf-8") + title.encode("utf-8")).hexdigest(),
                     title,
                     format_res(section, place, res),
-                    description=f"{place['level']}"
+                    description=f"{place['level']}",
+                    cache_time=0
                 ))
 
             bot.answer_inline_query(q.id, r)
