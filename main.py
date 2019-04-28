@@ -66,17 +66,18 @@ def query_elections(q):
         elif section == "avances":
             places = elections.getPlaces(query, section)
 
-            logger.info(f"[{q.from_user.id}][{q.from_user.first_name} {q.from_user.last_name} @{q.from_user.username}]: {section} {query} - Results: {', '.join(places.values())}")
+            logger.info(f"[{q.from_user.id}][{q.from_user.first_name} {q.from_user.last_name} @{q.from_user.username}]: {section} {query} - Results: {[p[0] for p in places.values()]}")
 
             r = []
             for cod, place in places.items():
                 res = elections.getAV(cod)
 
-                title = f"{place} ({cod})"
+                title = f"{place[0]} ({cod})"
                 r.append(types.InlineQueryResultArticle(
                     hashlib.sha256(section.encode("utf-8") + title.encode("utf-8")).hexdigest(),
                     title,
-                    format_av(place, res)
+                    format_av(place[0], res),
+                    description=f"{place[1]}"
                 ))
 
             bot.answer_inline_query(q.id, r)
@@ -84,17 +85,18 @@ def query_elections(q):
         else:
             places = elections.getPlaces(query, section)
 
-            logger.info(f"[{q.from_user.id}][{q.from_user.first_name} {q.from_user.last_name} @{q.from_user.username}]: {section} {query} - Results: {', '.join(places.values())}")
+            logger.info(f"[{q.from_user.id}][{q.from_user.first_name} {q.from_user.last_name} @{q.from_user.username}]: {section} {query} - Results: {[p[0] for p in places.values()]}")
 
             r = []
             for cod, place in places.items():
                 res = elections.getResults(cod, section)
 
-                title = f"{place} ({cod})"
+                title = f"{place[0]} ({cod})"
                 r.append(types.InlineQueryResultArticle(
                     hashlib.sha256(section.encode("utf-8") + title.encode("utf-8")).hexdigest(),
                     title,
-                    format_res(section, place, res)
+                    format_res(section, place[0], res),
+                    description=f"{place[1]}"
                 ))
 
             bot.answer_inline_query(q.id, r)

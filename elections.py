@@ -31,8 +31,14 @@ CODES = {
 
 
 names = {
-    "places": {},
-    "parties": {}
+    "places": {
+        "names": {},
+        "data": {}
+    },
+    "parties": {
+        "names": {},
+        "data": {}
+    }
 }
 
 
@@ -46,20 +52,22 @@ def loadNomenclator():
     res = r.json()
 
     for code in CODES.values():
-        names["places"][code] = {p["c"]: p["n"] for p in res["ambitos"][code.lower()]}
+        names["places"]["names"][code] = {p["n"] for p in res["ambitos"][code.lower()]}
+        names["places"]["data"][code] = {p["c"]: (p["n"], res["constantes"]["level"][str(p["l"])]) for p in res["ambitos"][code.lower()]}
         names["parties"][code] = {p["codpar"]: (p["siglas"], p["nombre"]) for p in res["partidos"][code.lower()]["act"]}
 
 
 def getPlaces(name, election, limit=4):
-    if not name:
-        name = "Total nacional"
-
     if election == "avances":
         election = "congreso"
 
-    pos = difflib.get_close_matches(name, names["places"][CODES[election]].values(), n=limit)
+    if not name:
+        pos = ["Total nacional"]
 
-    return {c: n for c, n in names["places"][CODES[election]].items() if n in pos}
+    else:
+        pos = difflib.get_close_matches(name, names["places"]["names"][CODES[election]], n=limit)
+
+    return {c: n for c, n in names["places"]["data"][CODES[election]].items() if n[0] in pos}
 
 
 def sortResults(r):
