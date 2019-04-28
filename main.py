@@ -67,7 +67,7 @@ def query_elections(q):
 
             places = elections.getPlaces(query, election)
 
-            logger.info(f"Query: {election} {query} - Results: {', '.join(places.values())}")
+            logger.info(f"[{q.from_user.id}][{q.from_user.first_name} {q.from_user.last_name} @{q.from_user.username}]: {election} {query} - Results: {', '.join(places.values())}")
 
             r = []
             for cod, place in places.items():
