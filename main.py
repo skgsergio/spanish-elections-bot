@@ -58,13 +58,15 @@ def query_elections(q):
             bot.answer_inline_query(q.id, [
                 types.InlineQueryResultArticle(
                     "None",
-                    f"Indica la elección: {', '.join(elections.CODES.keys())}",
-                    types.InputTextMessageContent(f"Especifica los datos que quieres consultar: {', '.join(elections.CODES.keys())}, avances")
+                    f"Escribe que dato quieres consultar: {', '.join(elections.CODES.keys())}, avances",
+                    types.InputTextMessageContent(f"No has especificado el dato a consultar: {', '.join(elections.CODES.keys())}, avances")
                 )
             ])
 
         elif section == "avances":
             places = elections.getPlaces(query, section)
+
+            logger.info(f"[{q.from_user.id}][{q.from_user.first_name} {q.from_user.last_name} @{q.from_user.username}]: {section} {query} - Results: {', '.join(places.values())}")
 
             r = []
             for cod, place in places.items():
