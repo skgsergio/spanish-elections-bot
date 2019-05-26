@@ -30,6 +30,11 @@ CODES = {
     "senado": "SE"
 }
 
+CODES_NOMENCLATOR = {
+    "CO": "co",
+    "SE": "se"
+}
+
 SECTIONS = {
     "avances": "Avances",
     "congreso": "Congreso",
@@ -59,9 +64,9 @@ def loadNomenclator():
     res = r.json()
 
     for code in CODES.values():
-        names["places"]["names"][code] = {p["n"] for p in res["ambitos"][code.lower()]}
-        names["places"]["data"][code] = {p["c"]: {"name": p["n"], "level": res["constantes"]["level"][str(p["l"])], "i": p["i"]} for p in res["ambitos"][code.lower()]}
-        names["parties"][code] = {p["codpar"]: (p["siglas"], p["nombre"]) for p in res["partidos"][code.lower()]["act"]}
+        names["places"]["names"][code] = {p["n"] for p in res["ambitos"][CODES_NOMENCLATOR[code]]}
+        names["places"]["data"][code] = {p["c"]: {"name": p["n"], "level": res["constantes"]["level"][str(p["l"])], "i": p["i"]} for p in res["ambitos"][CODES_NOMENCLATOR[code]]}
+        names["parties"][code] = {p["codpar"]: (p["siglas"], p["nombre"]) for p in res["partidos"][CODES_NOMENCLATOR[code]]["act"]}
 
 
 def getLink(section, i):
