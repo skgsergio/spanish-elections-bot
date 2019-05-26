@@ -19,27 +19,24 @@ import difflib
 import requests
 
 
-SITE_BASE = "https://www.resultados.eleccionesgenerales19.es"
+SITE_BASE = "https://resultados2019.comunidad.madrid"
 NOMENCLATOR = SITE_BASE + "/assets/nomenclator.json"
 RESULTS = SITE_BASE + "/json/{t}/{t}{cod}.json"
-AV = SITE_BASE + "/json/AV/CO{cod}.json"
+AV = SITE_BASE + "/json/AV/DA{cod}.json"
 LINK = SITE_BASE + "/{section}/{i}/es"
-TOTAL_NAME = "Total nacional"
+TOTAL_NAME = "Comunidad de Madrid"
 
 CODES = {
-    "congreso": "CO",
-    "senado": "SE"
+    "resultados": "AU"
 }
 
 CODES_NOMENCLATOR = {
-    "CO": "co",
-    "SE": "se"
+    "AU": "1"
 }
 
 SECTIONS = {
     "avances": "Avances",
-    "congreso": "Congreso",
-    "senado": "Senado"
+    "resultados": "Resultados",
 }
 
 
@@ -76,7 +73,7 @@ def getLink(section, i):
 
 def getPlaces(name, section, limit=4):
     if section == "avances":
-        section = CODES.keys()[0]
+        section = list(CODES.keys())[0]
 
     if not name:
         pos = [TOTAL_NAME]
