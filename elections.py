@@ -24,6 +24,7 @@ NOMENCLATOR = SITE_BASE + "/assets/nomenclator.json"
 RESULTS = SITE_BASE + "/json/{t}/{t}{cod}.json"
 AV = SITE_BASE + "/json/AV/CO{cod}.json"
 LINK = SITE_BASE + "/{section}/{i}/es"
+TOTAL_NAME = "Total nacional"
 
 CODES = {
     "congreso": "CO",
@@ -75,10 +76,10 @@ def getLink(section, i):
 
 def getPlaces(name, section, limit=4):
     if section == "avances":
-        section = "congreso"
+        section = CODES.keys()[0]
 
     if not name:
-        pos = ["Total nacional"]
+        pos = [TOTAL_NAME]
 
     else:
         pos = difflib.get_close_matches(name, names["places"]["names"][CODES[section]], n=limit)
