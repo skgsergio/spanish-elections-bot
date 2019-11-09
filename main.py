@@ -34,6 +34,8 @@ with open("token.txt") as f:
 
 username = bot.get_me().username
 
+logger.info(f"Bot: @{username}")
+
 
 @bot.message_handler(commands=["start", "help"])
 def i_am_inline(m):
@@ -145,8 +147,11 @@ def format_res(section, place, res):
 def format_av(place, res):
     s = f"Avances de participación en <b>{place['name']}</b>\n"
 
-    for r in res:
-        s += f"\n• {r['vava']} ({r['pvava']}) [<i>{r['dvava']}</i> (<i>{r['dpvava']}</i>)]"
+    if res:
+        for r in res:
+            s += f"\n• {r['vava']} ({r['pvava']}) [<i>{r['dvava']}</i> (<i>{r['dpvava']}</i>)]"
+    else:
+        s += f"\n• Aún no hay avances de participación"
 
     return types.InputTextMessageContent(s, parse_mode="HTML")
 

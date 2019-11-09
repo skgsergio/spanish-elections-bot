@@ -19,24 +19,27 @@ import difflib
 import requests
 
 
-SITE_BASE = "https://resultados2019.comunidad.madrid"
+SITE_BASE = "https://resultados.10noviembre2019.es"
 NOMENCLATOR = SITE_BASE + "/assets/nomenclator.json"
 RESULTS = SITE_BASE + "/json/{t}/{t}{cod}.json"
-AV = SITE_BASE + "/json/AV/DA{cod}.json"
+AV = SITE_BASE + "/json/AV/CO{cod}.json"
 LINK = SITE_BASE + "/{section}/{i}/es"
-TOTAL_NAME = "Comunidad de Madrid"
+TOTAL_NAME = "Total nacional"
 
 CODES = {
-    "resultados": "AU"
+    "congreso": "CO",
+    "senado": "SE"
 }
 
 CODES_NOMENCLATOR = {
-    "AU": "1"
+    "CO": "co",
+    "SE": "se"
 }
 
 SECTIONS = {
     "avances": "Avances",
-    "resultados": "Resultados",
+    "congreso": "Congreso",
+    "senado": "Senado"
 }
 
 
