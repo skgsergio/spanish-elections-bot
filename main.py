@@ -63,8 +63,9 @@ def query_elections(q):
             bot.answer_inline_query(q.id, [
                 types.InlineQueryResultArticle(
                     "None",
-                    f"Escribe que dato quieres consultar: {', '.join(elections.CODES.keys())}, avances",
-                    types.InputTextMessageContent(f"No has especificado el dato a consultar: {', '.join(elections.CODES.keys())}, avances")
+                    "Escribe que dato quieres consultar:",
+                    types.InputTextMessageContent(f"No has especificado el dato a consultar: {', '.join(elections.CODES.keys())}, avances"),
+                    description=f"{', '.join(elections.CODES.keys())}, avances"
                 )
             ])
 
